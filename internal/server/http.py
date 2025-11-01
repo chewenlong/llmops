@@ -8,6 +8,7 @@
 import os
 
 from flask import Flask
+from flask_migrate import Migrate
 
 from config import Config
 from internal.exception.exception import CustomerException
@@ -20,7 +21,12 @@ from pkg.sqlalchemy import SQLAlchemy
 class Http(Flask):
     """http服务引擎"""
 
-    def __init__(self, *args, conf: Config, db: SQLAlchemy, router: Router, **kwargs):
+    def __init__(self, *args,
+                 conf: Config,
+                 db: SQLAlchemy,
+                 migrate: Migrate,
+                 router: Router,
+                 **kwargs):
         super().__init__(*args, **kwargs)
 
         # 初始化应用配置
@@ -32,9 +38,11 @@ class Http(Flask):
         # 初始化flask扩展
         db.init_app(self)
 
+        # 初始化migrate扩展
+        migrate.init_app(self, db, "internal/migration")
         with self.app_context():
             _ = App()
-            db.create_all()
+            # db.create_all()
 
         # 注册应用路由
         router.register_router(self)

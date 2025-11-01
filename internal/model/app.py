@@ -30,5 +30,6 @@ class App(db.Model):
     name = db.Column(String(255), nullable=False, default="")
     icon = db.Column(String(255), nullable=False, default="")
     description = db.Column(Text, nullable=False, default="")
+    status = db.Column(Text, nullable=False, default="")
     created_at = db.Column(DateTime, default=datetime.now, onupdate=datetime.now, nullable=False)
     updated_at = db.Column(DateTime, default=datetime.now, nullable=False)
