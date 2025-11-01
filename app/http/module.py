@@ -5,10 +5,10 @@
 @Author  : chewl1
 @File    : module.py
 """
-from flask_sqlalchemy import SQLAlchemy
 from injector import Binder, Module
 
 from internal.extension.database_extension import db
+from pkg.sqlalchemy import SQLAlchemy
 
 
 class ExtensionModule(Module):

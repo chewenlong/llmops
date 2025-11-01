@@ -8,10 +8,10 @@
 import uuid
 from dataclasses import dataclass
 
-from flask_sqlalchemy import SQLAlchemy
 from injector import inject
 
 from internal.model import App
+from pkg.sqlalchemy import SQLAlchemy
 
 
 @inject
@@ -21,9 +21,9 @@ class AppService:
     db: SQLAlchemy
 
     def create_app(self) -> App:
-        app = App(name="测试机器人", account_id=uuid.uuid4(), icon="", description="这是一个智能机器人应用")
-        self.db.session.add(app)
-        self.db.session.commit()
+        with self.db.auto_commit():
+            app = App(name="测试机器人", account_id=uuid.uuid4(), icon="", description="这是一个智能机器人应用")
+            self.db.session.add(app)
         return app
 
     # select by id
@@ -33,14 +33,14 @@ class AppService:
 
     # update by id
     def update_app(self, app_id: uuid.UUID) -> App:
-        app = self.get_app_by_id(app_id)
-        app.name = "聊天机器人"
-        self.db.session.commit()
+        with self.db.init_app():
+            app = self.get_app_by_id(app_id)
+            app.name = "聊天机器人"
         return app
 
     # delete by id
     def delete_app(self, app_id: uuid.UUID) -> None:
-        app = self.get_app_by_id(app_id)
-        self.db.session.delete(app)
-        self.db.session.commit()
+        with self.db.auto_commit():
+            app = self.get_app_by_id(app_id)
+            self.db.session.delete(app)
         return app
