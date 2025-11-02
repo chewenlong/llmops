@@ -10,7 +10,9 @@ import uuid
 from dataclasses import dataclass
 
 from injector import inject
-from openai import OpenAI
+from langchain_community.chat_models import ChatTongyi
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
 
 from internal.exception import FailException
 from internal.schema.app_schema import CompletionReq
@@ -47,22 +49,15 @@ class AppHandler:
         req = CompletionReq()
         if not req.validate():
             return validate_error_json(req.errors)
-        query = req.query.data
-        self.openai_api_key = os.getenv("DASHSCOPE_API_KEY")  # 读取 OpenAI API Key
-        self.base_url = os.getenv("BASE_URL")  # 读取 BASE YRL
-        self.model = os.getenv("MODEL")  # 读取 model
-        if not self.openai_api_key:
-            raise ValueError("❌ 未找到 API Key，请在 .env 文件中设置KEY")
-        self.client = OpenAI(api_key=self.openai_api_key, base_url=self.base_url)
-        print(self.openai_api_key, self.base_url, self.model)
-        completion = self.client.chat.completions.create(
-            model=self.model,
-            messages=[
-                {"role": "system", "content": "你是阿里开发的聊天机器人，请根据用户的输入回复对应的信息"},
-                {"role": "user", "content": query}
-            ]
+        prompt = ChatPromptTemplate.from_template("{query}")
+        llm = ChatTongyi(
+            model_name=os.getenv("MODEL"),
+            dashscope_api_key=os.getenv("DASHSCOPE_API_KEY"),
+            top_p=0.8,
         )
-        content = completion.choices[0].message.content
+        ai_message = llm.invoke(prompt.invoke({"query": req.query.data}))
+        parser = StrOutputParser()
+        content = parser.invoke(ai_message)
         resp = success_json(data={"content": content})
         return resp
 

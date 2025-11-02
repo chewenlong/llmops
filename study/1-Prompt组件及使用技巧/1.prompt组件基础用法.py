@@ -3,7 +3,7 @@
 """
 @Time    : 2025/11/2 11:27
 @Author  : chewl1
-@File    : 1prompt组件基础用法.py
+@File    : 1.prompt组件基础用法.py
 """
 from datetime import datetime
 

@@ -3,7 +3,7 @@
 """
 @Time    : 2025/11/2 12:06
 @Author  : chewl1
-@File    : 2字符串提示拼接.py
+@File    : 2.字符串提示拼接.py
 """
 from langchain_core.prompts import PromptTemplate
 
