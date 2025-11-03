@@ -55,8 +55,9 @@ class AppHandler:
             dashscope_api_key=os.getenv("DASHSCOPE_API_KEY"),
             top_p=0.8,
         )
-        ai_message = llm.invoke(prompt.invoke({"query": req.query.data}))
         parser = StrOutputParser()
+        chain = prompt | llm | parser
+        ai_message = chain.invoke({"query": req.query.data})
         content = parser.invoke(ai_message)
         resp = success_json(data={"content": content})
         return resp
